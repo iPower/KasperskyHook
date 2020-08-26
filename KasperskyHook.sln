@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29926.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KasperskyHookDrv", "KasperskyHookDrv\KasperskyHookDrv.vcxproj", "{0931F5CD-729C-4256-AC34-4FF8F7F3E294}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KasperskyHookLoader", "KasperskyHookLoader\KasperskyHookLoader.vcxproj", "{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|ARM = Release|ARM
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|ARM.ActiveCfg = Debug|ARM
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|ARM.Build.0 = Debug|ARM
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|ARM.Deploy.0 = Debug|ARM
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|ARM64.Build.0 = Debug|ARM64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|x64.ActiveCfg = Debug|x64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|x64.Build.0 = Debug|x64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|x64.Deploy.0 = Debug|x64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|x86.ActiveCfg = Debug|Win32
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|x86.Build.0 = Debug|Win32
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Debug|x86.Deploy.0 = Debug|Win32
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|ARM.ActiveCfg = Release|ARM
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|ARM.Build.0 = Release|ARM
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|ARM.Deploy.0 = Release|ARM
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|ARM64.ActiveCfg = Release|ARM64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|ARM64.Build.0 = Release|ARM64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|ARM64.Deploy.0 = Release|ARM64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|x64.ActiveCfg = Release|x64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|x64.Build.0 = Release|x64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|x64.Deploy.0 = Release|x64
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|x86.ActiveCfg = Release|Win32
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|x86.Build.0 = Release|Win32
+		{0931F5CD-729C-4256-AC34-4FF8F7F3E294}.Release|x86.Deploy.0 = Release|Win32
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Debug|ARM.ActiveCfg = Debug|Win32
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Debug|x64.ActiveCfg = Debug|x64
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Debug|x64.Build.0 = Debug|x64
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Debug|x86.ActiveCfg = Debug|Win32
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Debug|x86.Build.0 = Debug|Win32
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Release|ARM.ActiveCfg = Release|Win32
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Release|ARM64.ActiveCfg = Release|Win32
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Release|x64.ActiveCfg = Release|x64
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Release|x64.Build.0 = Release|x64
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Release|x86.ActiveCfg = Release|Win32
+		{AC843DC7-AE89-45D5-AD78-EDCB560ACCC3}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7CA8CCCE-5E05-4A8F-B974-BF3B4C238648}
+	EndGlobalSection
+EndGlobal
