@@ -20,7 +20,7 @@ While researching Kaspersky components, I thought it was an interesting idea to 
 ## Build steps - how to use it
 
 * Download [Visual Studio 2019](https://visualstudio.microsoft.com/pt-br/downloads/), [WDK](https://docs.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk), clone this repository and build the solution.
-* Make sure `klhk.sys`, `KasperskyHook.sys` and `KasperskyHookLoader.exe` are in the same folder.
+* Make sure `KasperskyHook.sys` and `KasperskyHookLoader.exe` are in the same folder. Copy `klhk.sys` to `\Windows\System32\drivers`
 * Execute `KasperskyHookLoader.exe` and have fun :D
 
 
