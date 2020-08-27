@@ -30,9 +30,9 @@ int main()
         return EXIT_FAILURE;
     }
 
-    // Make sure klhk.sys gets Shadow SSDT information by converting the current thread to a GUI thread
+    // Just to make sure klhk.sys gets Shadow SSDT information. You can change this to whatever you want.
     //
-    IsGUIThread( TRUE );
+    MessageBoxA( nullptr, "Dummy", "Dummy", MB_OK );
 
     // Load KasperskyHook.sys
     //
@@ -46,7 +46,7 @@ int main()
 
         // Do cleanup for klhk
         //
-        klhk::cleanup( true );
+        klhk::cleanup( false );
 
         // Close handle to SCM
         //

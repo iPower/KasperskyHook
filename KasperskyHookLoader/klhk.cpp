@@ -7,14 +7,16 @@ HKEY      hparameters_key = nullptr;
 //
 bool klhk::load()
 {
-    // Get current directory
+    // Get system32 directory
     //
     char buf[ MAX_PATH ]{ };
-    GetCurrentDirectoryA( sizeof( buf ), buf );
+    
+    if ( !GetSystemDirectoryA( buf, sizeof( buf ) ) )
+        return false;
 
     // Build klhk.sys path
     //
-    const auto path = std::string( buf ) + "\\klhk.sys";
+    const auto path = std::string( buf ) + "\\drivers\\klhk.sys";
 
 	// Create klhk service
 	//
