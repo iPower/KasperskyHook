@@ -32,7 +32,8 @@ If you followed the Build and Testing steps and `set_hvm_event()` returns `C0000
 * Check if there are any other hypervisors conflicting with klhk (such as other AVs)
 * Delete all KasperskyHook-related services, cleanup registry information and reboot
 
-If it still doesn't work, considering using a newer version of klhk.sys. More information: https://github.com/iPower/KasperskyHook/issues/4
+If it still doesn't work, consider using a newer version of klhk.sys. More information: https://github.com/iPower/KasperskyHook/issues/4
+
 
 **MAKE SURE TO ENABLE TEST MODE TO TEST THIS PROJECT. IF YOU WISH TO USE IT OUTSIDE TEST MODE, USE YOUR CUSTOM DRIVER LOADER OR SIGN THE DRIVER.**
 
