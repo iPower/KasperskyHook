@@ -14,9 +14,7 @@ unsigned int* provider                  = nullptr;
 //
 bool kaspersky::is_klhk_loaded()
 {
-	const auto entry = kernel_modules::get_ldr_data_by_name( L"klhk.sys" );
-
-	return entry != nullptr;
+	return kernel_modules::get_kernel_module_base( L"klhk.sys" ) != 0;
 }
 
 // Finds required addresses by pattern scanning klhk.sys
@@ -157,7 +155,7 @@ bool kaspersky::hook_shadow_ssdt_routine( unsigned short index, void* dest, void
 	// Failed to obtain service count
 	//
 	if ( !svc_count || !svc_count_shadow_ssdt )
-		return nullptr;
+		return false;
 
 	// Calculate index for dispatch table
 	//
@@ -194,7 +192,7 @@ bool kaspersky::unhook_shadow_ssdt_routine( unsigned short index, void* original
 	// Failed to obtain service count
 	//
 	if ( !svc_count || !svc_count_shadow_ssdt )
-		return nullptr;
+		return false;
 
 	// Calculate index for dispatch table
 	//
@@ -237,7 +235,7 @@ void* kaspersky::get_ssdt_routine( unsigned short index )
 void* kaspersky::get_shadow_ssdt_routine( unsigned short index )
 {
 	if ( !system_dispatch_array )
-		return false;
+		return nullptr;
 
 	// Get service count for ssdt and shadow ssdt
 	//

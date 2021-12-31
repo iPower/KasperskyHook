@@ -21,8 +21,8 @@ bool klhk::load()
 	// Create klhk service
 	//
 	handle_klhk_svc = loader::create_service( "klhk", 
-                                                  "Kaspersky Lab service driver", 
-                                                   path );
+                                              "Kaspersky Lab service driver", 
+                                              path );
 
 	// Failed to create service
 	//

@@ -6,7 +6,7 @@
 //
 DRIVER_UNLOAD DriverUnload;
 
-// This is just a demo, don't hardcode SSDT indexes.
+// This is just a demo, don't hardcode SSDT indexes
 //
 constexpr unsigned short NtCreateFile_index = 0x55;
 
@@ -18,17 +18,22 @@ EXTERN_C NTSTATUS DriverEntry( PDRIVER_OBJECT DriverObject, PUNICODE_STRING Regi
 
 	// Setup DriverUnload routine so this driver can unload safely
 	//
-	DriverObject->DriverUnload = DriverUnload;
+	DriverObject->DriverUnload = &DriverUnload;
+
+	// Initialize global pointers that are used by this driver
+	//
+	if ( !utils::init() )
+		return STATUS_ORDINAL_NOT_FOUND;
 
 	// Initialization related to klhk.sys
 	//
 	if ( !kaspersky::is_klhk_loaded() || !kaspersky::initialize() )
-		return STATUS_UNSUCCESSFUL;
+		return STATUS_NOT_FOUND;
 
 	// Initialize hypervisor
 	//
 	if ( !kaspersky::hvm_init() )
-		return STATUS_UNSUCCESSFUL;
+		return STATUS_NOT_SUPPORTED;
 
 	// SSDT hooks
 	//

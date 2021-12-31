@@ -5,7 +5,7 @@
 //
 f_NtCreateFile o_NtCreateFile = nullptr;
 
-// Our hook to NtCreateFile. Useless hook for now
+// Our hook to NtCreateFile. It's just a demonstration
 //
 NTSTATUS hooks::hk_NtCreateFile
 (
