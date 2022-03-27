@@ -40,7 +40,7 @@ bool kaspersky::initialize()
 
 	// Find number of services (SSDT)
 	//
-	presult = utils::find_pattern_km( L"klhk.sys", ".text", "\x3B\x1D\x00\x00\x00\x00\x73\x56", "xx????xx" );
+	presult = utils::find_pattern_km( L"klhk.sys", ".text", "\x89\x0D\x00\x00\x00\x00\x8B\xFB", "xx????xx" );
 
 	if ( !presult )
 		return false;
@@ -94,7 +94,7 @@ unsigned int kaspersky::get_svc_count_shadow_ssdt()
 	return shadow_ssdt_service_count ? *shadow_ssdt_service_count : 0;
 }
 
-// Hooks SSDT functions by changing klhk's service table.
+// Hooks SSDT functions by changing klhk's service table
 //
 bool kaspersky::hook_ssdt_routine( unsigned short index, void* dest, void** poriginal )
 {
