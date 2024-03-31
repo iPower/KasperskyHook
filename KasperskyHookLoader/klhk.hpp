@@ -2,8 +2,11 @@
 
 #include "loader.hpp"
 
+//
+// klhk.sys helpers.
+//
 namespace klhk
 {
-	bool load    ();
+	bool load    ( );
 	void cleanup ( bool delete_service );
 }

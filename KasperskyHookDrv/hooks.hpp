@@ -3,7 +3,8 @@
 #include <ntifs.h>
 #include <windef.h>
 
-// Typedefs
+//
+// Function typedefs.
 //
 using f_NtCreateFile = NTSTATUS( * )
 (
@@ -20,7 +21,8 @@ using f_NtCreateFile = NTSTATUS( * )
 	ULONG              EaLength
 );
 
-// Functions (hooks)
+//
+// Functions (hooks).
 //
 namespace hooks
 {
@@ -40,6 +42,7 @@ namespace hooks
 	);
 }
 
-// Function pointers to original funcs
 //
-extern f_NtCreateFile o_NtCreateFile;
+// Function pointers to original functions.
+//
+inline f_NtCreateFile o_NtCreateFile = nullptr;

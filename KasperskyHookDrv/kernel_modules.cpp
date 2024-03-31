@@ -8,7 +8,7 @@ uintptr_t kernel_modules::get_kernel_module_base( const wchar_t* szmodule )
 	UNICODE_STRING module_name{ };
 	RtlInitUnicodeString( &module_name, szmodule );
 
-	KeEnterCriticalRegion();
+	KeEnterCriticalRegion( );
 	ExAcquireResourceSharedLite( PsLoadedModuleResource, TRUE );
 
 	uintptr_t module_base = 0;
@@ -27,7 +27,7 @@ uintptr_t kernel_modules::get_kernel_module_base( const wchar_t* szmodule )
 	}
 
 	ExReleaseResourceLite( PsLoadedModuleResource );
-	KeLeaveCriticalRegion();
+	KeLeaveCriticalRegion( );
 
 	return module_base;
 }

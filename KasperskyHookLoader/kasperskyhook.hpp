@@ -2,10 +2,11 @@
 
 #include "loader.hpp"
 
-// Functions for KasperskyHook
+//
+// Functions for KasperskyHook.sys.
 //
 namespace kasperskyhook
 {
-	bool load   ();
-	bool unload ();
+	bool load   ( );
+	bool unload ( );
 }

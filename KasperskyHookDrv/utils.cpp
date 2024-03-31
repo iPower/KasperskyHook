@@ -45,13 +45,13 @@ void* utils::get_system_routine( const wchar_t* szroutine )
 	if ( !szroutine )
 		return nullptr;
 
-	UNICODE_STRING routine{ };
+	UNICODE_STRING routine { };
 	RtlInitUnicodeString( &routine, szroutine );
 
 	return MmGetSystemRoutineAddress( &routine );
 }
 
-uintptr_t utils::get_ntos_base()
+uintptr_t utils::get_ntos_base( )
 {
 	using f_RtlPcToFileHeader = PVOID( * )( PVOID PcValue, PVOID* BaseOfImage );
 	const auto RtlPcToFileHeader = reinterpret_cast< f_RtlPcToFileHeader >( get_system_routine( L"RtlPcToFileHeader" ) );
@@ -65,9 +65,9 @@ uintptr_t utils::get_ntos_base()
 	return ntos_base;
 }
 
-bool utils::init()
+bool utils::init( )
 {
-	const auto ntos_base = get_ntos_base();
+	const auto ntos_base = get_ntos_base( );
 
 	if ( !ntos_base )
 		return false;
@@ -110,5 +110,5 @@ bool utils::init()
 		PsLoadedModuleResource = reinterpret_cast< PERESOURCE >( result + *reinterpret_cast< int* >( result + 0x3 ) + 0x7 );
 	}
 
-	return true;
+	return PsLoadedModuleList && PsLoadedModuleResource;
 }

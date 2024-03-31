@@ -3,33 +3,39 @@
 SC_HANDLE handle_klhk_svc = nullptr;
 HKEY      hparameters_key = nullptr;
 
-// Loads klhk.sys
 //
-bool klhk::load()
+// Loads klhk.sys.
+//
+bool klhk::load( )
 {
-    // Get system32 directory
+    //
+    // Get system32 directory.
     //
     char buf[ MAX_PATH ]{ };
-    
+
     if ( !GetSystemDirectoryA( buf, sizeof( buf ) ) )
         return false;
 
-    // Build klhk.sys path
     //
-    const auto path = std::string( buf ) + "\\drivers\\klhk.sys";
+    // Build klhk.sys path.
+    //
+    const auto path = std::string{ buf } + "\\drivers\\klhk.sys";
 
-	// Create klhk service
-	//
-	handle_klhk_svc = loader::create_service( "klhk", 
-                                              "Kaspersky Lab service driver", 
+    //
+    // Create klhk service.
+    //
+    handle_klhk_svc = loader::create_service( "klhk",
+                                              "Kaspersky Lab service driver",
                                               path );
 
-	// Failed to create service
-	//
-	if ( !handle_klhk_svc )
-		return false;
+    //
+    // Failed to create klhk service.
+    //
+    if ( !handle_klhk_svc )
+        return false;
 
-    // Create Parameters subkey
+    //
+    // Create Parameters subkey.
     //
     auto error_code = RegCreateKeyEx( HKEY_LOCAL_MACHINE,
                                       TEXT( "System\\CurrentControlSet\\Services\\klhk\\Parameters" ),
@@ -41,18 +47,20 @@ bool klhk::load()
                                       &hparameters_key,
                                       nullptr );
 
-    // Failed to create Parameters key
+    //
+    // Failed to create Parameters key.
     //
     if ( error_code != ERROR_SUCCESS )
     {
-        // Delete service
+        //
+        // Delete klhk service.
         //
         loader::delete_service( handle_klhk_svc );
-
         return false;
     }
 
-    // Setup UseHvm parameter
+    //
+    // Setup UseHvm parameter.
     //
     DWORD use_hvm = 1;
 
@@ -63,37 +71,43 @@ bool klhk::load()
                                 reinterpret_cast< const BYTE* >( &use_hvm ),
                                 sizeof( use_hvm ) );
 
-    // Failed to set up parameter
+    //
+    // Failed to set up parameter.
     //
     if ( error_code != ERROR_SUCCESS )
     {
-        // Delete Parameters key
+        //
+        // Delete Parameters key.
         //
         RegDeleteKey( HKEY_LOCAL_MACHINE, TEXT( "System\\CurrentControlSet\\Services\\klhk\\Parameters" ) );
         RegCloseKey( hparameters_key );
 
-        // Delete service
+        //
+        // Delete service.
         //
         loader::delete_service( handle_klhk_svc );
-
         return false;
     }
 
-    // Load klhk.sys
+    //
+    // Load klhk.sys.
     //
     const auto success = loader::start_service( handle_klhk_svc );
 
-    // Failed to load klhk.sys
+    //
+    // Failed to load klhk.sys.
     //
     if ( !success )
     {
-        // Delete UseHvm value and Parameters key
+        //
+        // Delete UseHvm value and Parameters key.
         //
         RegDeleteValue( hparameters_key, TEXT( "UseHvm" ) );
         RegDeleteKey( HKEY_LOCAL_MACHINE, TEXT( "System\\CurrentControlSet\\Services\\klhk\\Parameters" ) );
         RegCloseKey( hparameters_key );
 
-        // Delete service
+        //
+        // Delete service.
         //
         loader::delete_service( handle_klhk_svc );
     }
@@ -101,25 +115,29 @@ bool klhk::load()
     return success;
 }
 
-// Close handles to resources
+//
+// Closes handles to resources.
 //
 void klhk::cleanup( bool delete_service )
 {
     if ( hparameters_key )
     {
-        // Close handle to parameters key
+        //
+        // Close handle to parameters key.
         //
         RegCloseKey( hparameters_key );
     }
 
     if ( handle_klhk_svc )
     {
-        // Mark service for deletion
+        //
+        // Mark service for deletion.
         //
         if ( delete_service )
             loader::delete_service( handle_klhk_svc );
 
-        // Close handle to klhk service
+        //
+        // Close handle to klhk service.
         //
         CloseServiceHandle( handle_klhk_svc );
     }
