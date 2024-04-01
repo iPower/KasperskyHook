@@ -26,7 +26,7 @@ While researching Kaspersky components, I thought it was an interesting idea to 
 
 ## Troubleshooting
 
-If you followed the Build and Testing steps and `set_hvm_event()` returns `C00000A3` or `C000090B`, try following these steps:
+If you followed the Build and Testing steps and `kaspersky::hvm_init()` returns `C00000A3` or `C000090B`, try following these steps:
 
 * Make sure Virtualization (VT-x/AMD-v) is supported and enabled.
 * Check if there are any other hypervisors conflicting with klhk (such as other AVs)
