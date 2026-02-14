@@ -26,14 +26,21 @@ While researching Kaspersky components, I thought it was an interesting idea to 
 
 ## Troubleshooting
 
-If you followed the Build and Testing steps and `kaspersky::hvm_init()` returns `C00000A3` or `C000090B`, try following these steps:
+If you're seeing `C00000A3` or `C000090B` from `kaspersky::hvm_init()`, it usually means the hypervisor component of the driver couldn't start. Here are the most common causes and how to fix them:
 
-* Make sure Virtualization (VT-x/AMD-v) is supported and enabled.
-* Check if there are any other hypervisors conflicting with klhk (such as other AVs)
-* Delete all KasperskyHook-related services, cleanup registry information and reboot
+- **Run on bare metal** – The driver refuses to load inside a virtual machine. Make sure you're on a physical machine.
+- **Enable hardware virtualization** – Check that VT-x (Intel) or AMD-V (AMD) is enabled in your BIOS/UEFI.
+- **Avoid conflicts with other hypervisors** – Windows Hyper-V, Virtualization-Based Security (VBS), or other antivirus software that uses hardware-assisted virtualization can block `klhk.sys`. Disable them if they're active.
+- **Match the Windows build** – klhk.sys contains a hardcoded offset for `ExGetPreviousMode` that must match your specific Windows version. If the pattern check fails, HVM won't start to avoid a crash. In this case, you should upgrade/downgrade the `klhk.sys` driver.
 
-If it still doesn't work, consider using a newer version of klhk.sys. More information: https://github.com/iPower/KasperskyHook/issues/4
+If none of that helps, try a newer version of `klhk.sys` – there's more info and updates in [this GitHub issue](https://github.com/iPower/KasperskyHook/issues/4).
 
+For those curious about what the driver checks internally:  
+- It verifies the Windows build number and version – some older or specific builds are intentionally blocked (flags like `0x100`, `0x400`, or `0x2` get set).  
+- It looks for signatures of other hypervisors by checking CPUID leaves – e.g., `"VMXh"` for VMware, `"Microsoft Hv"` for Hyper-V, or vendor strings for KVM/VirtualBox.  
+- It also reads a registry value `UseHvm`; if that's not present, HVM stays disabled. This value is normally set by the KasperskyHookLoader – if you're writing your own loader, you'll need to replicate that.
+
+----
 
 **MAKE SURE TO ENABLE TEST MODE TO TEST THIS PROJECT. IF YOU WISH TO USE IT OUTSIDE TEST MODE, USE YOUR CUSTOM DRIVER LOADER OR SIGN THE DRIVER.**
 
