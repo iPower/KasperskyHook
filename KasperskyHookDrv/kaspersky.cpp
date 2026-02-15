@@ -1,33 +1,31 @@
 #include "kaspersky.hpp"
-
 #include "kernel_modules.hpp"
-#include "logger.hpp"
 #include "utils.hpp"
 
 //
 // Global pointers for klhk.sys variables.
 //
-PETHREAD* hvm_thread_object = nullptr;
-PLONG hvm_run_requests = nullptr;
-PRKEVENT hvm_notification_event = nullptr;
-PRKEVENT hvm_sync_event = nullptr;
-PNTSTATUS hvm_status = nullptr;
-void*** system_dispatch_array = nullptr;
-unsigned int* ssdt_service_count = nullptr;
+PETHREAD*     hvm_thread_object         = nullptr;
+PLONG         hvm_run_requests          = nullptr;
+PRKEVENT      hvm_notification_event    = nullptr;
+PRKEVENT      hvm_sync_event            = nullptr;
+PNTSTATUS     hvm_status                = nullptr;
+void***       system_dispatch_array     = nullptr;
+unsigned int* ssdt_service_count        = nullptr;
 unsigned int* shadow_ssdt_service_count = nullptr;
-unsigned int* provider = nullptr;
+unsigned int* provider                  = nullptr;
 
 //
 // Checks if klhk.sys is loaded.
 //
-bool kaspersky::is_klhk_loaded() {
-    return kernel_modules::get_kernel_module_base(L"klhk.sys") != 0;
+bool kaspersky::is_klhk_loaded( )
+{
+	return kernel_modules::get_kernel_module_base( L"klhk.sys" ) != 0;
 }
 
 //
 // Finds required addresses by pattern scanning klhk.sys.
 //
-
 bool kaspersky::initialize() {
     //
     // Find klhk's hvm thread object.
@@ -174,214 +172,210 @@ NTSTATUS kaspersky::hvm_init() {
     //
     return *hvm_status;
 }
-
 //
 // Gets the number of services in the SSDT.
 //
-unsigned int kaspersky::get_svc_count_ssdt() {
-    return ssdt_service_count ? *ssdt_service_count : 0;
+unsigned int kaspersky::get_svc_count_ssdt( )
+{
+	return ssdt_service_count ? *ssdt_service_count : 0;
 }
 
 //
 // Gets the number of services in the Shadow SSDT.
 //
-unsigned int kaspersky::get_svc_count_shadow_ssdt() {
-    return shadow_ssdt_service_count ? *shadow_ssdt_service_count : 0;
+unsigned int kaspersky::get_svc_count_shadow_ssdt( )
+{
+	return shadow_ssdt_service_count ? *shadow_ssdt_service_count : 0;
 }
 
 //
 // Hooks SSDT functions by changing klhk's service table.
 //
-bool kaspersky::hook_ssdt_routine(unsigned short index, void* dest,
-                                  void** poriginal) {
-    if (!system_dispatch_array || !dest || !poriginal)
-        return false;
+bool kaspersky::hook_ssdt_routine( unsigned short index, void* dest, void** poriginal )
+{
+	if ( !system_dispatch_array || !dest || !poriginal )
+		return false;
 
-    //
-    // Get SSDT service count.
-    //
-    const auto svc_count = get_svc_count_ssdt();
+	//
+	// Get SSDT service count.
+	//
+	const auto svc_count = get_svc_count_ssdt( );
 
-    //
-    // Kaspersky's SSDT isn't built / invalid index.
-    //
-    if (!svc_count || index >= svc_count)
-        return false;
+	//
+	// Kaspersky's SSDT isn't built / invalid index.
+	//
+	if ( !svc_count || index >= svc_count )
+		return false;
 
-    //
-    // Swap entry.
-    //
-    *poriginal = *system_dispatch_array[index];
-    *system_dispatch_array[index] = dest;
-    return true;
+	//
+	// Swap entry.
+	//
+	*poriginal = *system_dispatch_array[ index ];
+	*system_dispatch_array[ index ] = dest;
+	return true;
 }
 
 //
 // Unhooks SSDT function.
 //
-bool kaspersky::unhook_ssdt_routine(unsigned short index, void* original) {
-    if (!system_dispatch_array || !original)
-        return false;
+bool kaspersky::unhook_ssdt_routine( unsigned short index, void* original )
+{
+	if ( !system_dispatch_array || !original )
+		return false;
 
-    //
-    // Get SSDT service count.
-    //
-    const auto svc_count = get_svc_count_ssdt();
+	//
+	// Get SSDT service count.
+	//
+	const auto svc_count = get_svc_count_ssdt( );
 
-    //
-    // Kaspersky's SSDT isn't built / invalid index / function not hooked.
-    //
-    if (!svc_count || index >= svc_count ||
-        *system_dispatch_array[index] == original)
-        return false;
+	//
+	// Kaspersky's SSDT isn't built / invalid index / function not hooked.
+	//
+	if ( !svc_count || index >= svc_count || *system_dispatch_array[ index ] == original )
+		return false;
 
-    //
-    // Restore entry.
-    //
-    *system_dispatch_array[index] = original;
-    return true;
+	//
+	// Restore entry.
+	//
+	*system_dispatch_array[ index ] = original;
+	return true;
 }
 
 //
 // Hooks Shadow SSDT function.
 //
-bool kaspersky::hook_shadow_ssdt_routine(unsigned short index, void* dest,
-                                         void** poriginal) {
-    if (!system_dispatch_array || !dest || !poriginal)
-        return false;
+bool kaspersky::hook_shadow_ssdt_routine( unsigned short index, void* dest, void** poriginal )
+{
+	if ( !system_dispatch_array || !dest || !poriginal )
+		return false;
 
-    //
-    // Get service count for SSDT and Shadow SSDT.
-    //
-    const auto svc_count = get_svc_count_ssdt(),
-               svc_count_shadow_ssdt = get_svc_count_shadow_ssdt();
+	//
+	// Get service count for SSDT and Shadow SSDT.
+	//
+	const auto svc_count = get_svc_count_ssdt( ), svc_count_shadow_ssdt = get_svc_count_shadow_ssdt( );
 
-    //
-    // Failed to obtain service count.
-    //
-    if (!svc_count || !svc_count_shadow_ssdt)
-        return false;
+	//
+	// Failed to obtain service count.
+	//
+	if ( !svc_count || !svc_count_shadow_ssdt )
+		return false;
 
-    //
-    // Calculate index for dispatch table
-    //
-    const auto index_dispatch_table = (index - 0x1000) + svc_count;
+	//
+	// Calculate index for dispatch table
+	//
+	const auto index_dispatch_table = ( index - 0x1000 ) + svc_count;
 
-    //
-    // Get dispatch table limit.
-    //
-    const auto dispatch_table_limit = svc_count + svc_count_shadow_ssdt;
+	//
+	// Get dispatch table limit.
+	//
+	const auto dispatch_table_limit = svc_count + svc_count_shadow_ssdt;
 
-    //
-    // Invalid index.
-    //
-    if (index_dispatch_table >= dispatch_table_limit)
-        return false;
+	//
+	// Invalid index.
+	//
+	if ( index_dispatch_table >= dispatch_table_limit )
+		return false;
 
-    //
-    // Swap entry.
-    //
-    *poriginal = *system_dispatch_array[index_dispatch_table];
-    *system_dispatch_array[index_dispatch_table] = dest;
-    return true;
+	//
+	// Swap entry.
+	//
+	*poriginal = *system_dispatch_array[ index_dispatch_table ];
+	*system_dispatch_array[ index_dispatch_table ] = dest;
+	return true;
 }
 
 //
 // Unhooks Shadow SSDT function.
 //
-bool kaspersky::unhook_shadow_ssdt_routine(unsigned short index,
-                                           void* original) {
-    if (!system_dispatch_array || !original)
-        return false;
+bool kaspersky::unhook_shadow_ssdt_routine( unsigned short index, void* original )
+{
+	if ( !system_dispatch_array || !original )
+		return false;
 
-    //
-    // Get service count for SSDT and Shadow SSDT.
-    //
-    const auto svc_count = get_svc_count_ssdt(),
-               svc_count_shadow_ssdt = get_svc_count_shadow_ssdt();
+	//
+	// Get service count for SSDT and Shadow SSDT.
+	//
+	const auto svc_count = get_svc_count_ssdt( ), svc_count_shadow_ssdt = get_svc_count_shadow_ssdt( );
 
-    //
-    // Failed to obtain service count.
-    //
-    if (!svc_count || !svc_count_shadow_ssdt)
-        return false;
+	//
+	// Failed to obtain service count.
+	//
+	if ( !svc_count || !svc_count_shadow_ssdt )
+		return false;
 
-    //
-    // Calculate index for dispatch table.
-    //
-    const auto index_dispatch_table = (index - 0x1000) + svc_count;
+	//
+	// Calculate index for dispatch table.
+	//
+	const auto index_dispatch_table = ( index - 0x1000 ) + svc_count;
 
-    //
-    // Get dispatch table limit.
-    //
-    const auto dispatch_table_limit = svc_count + svc_count_shadow_ssdt;
+	//
+	// Get dispatch table limit.
+	//
+	const auto dispatch_table_limit = svc_count + svc_count_shadow_ssdt;
 
-    //
-    // Invalid index / function not hooked.
-    //
-    if (index_dispatch_table >= dispatch_table_limit ||
-        *system_dispatch_array[index_dispatch_table] == original)
-        return false;
+	//
+	// Invalid index / function not hooked.
+	//
+	if ( index_dispatch_table >= dispatch_table_limit || *system_dispatch_array[ index_dispatch_table ] == original )
+		return false;
 
-    //
-    // Restore entry.
-    //
-    *system_dispatch_array[index_dispatch_table] = original;
-    return true;
+	//
+	// Restore entry.
+	//
+	*system_dispatch_array[ index_dispatch_table ] = original;
+	return true;
 }
 
 //
 // Gets the pointer to a routine in SSDT by its index.
 //
-void* kaspersky::get_ssdt_routine(unsigned short index) {
-    if (!system_dispatch_array)
-        return nullptr;
+void* kaspersky::get_ssdt_routine( unsigned short index )
+{
+	if ( !system_dispatch_array )
+		return nullptr;
 
-    //
-    // Get SSDT service count.
-    //
-    const auto svc_count = get_svc_count_ssdt();
+	//
+	// Get SSDT service count.
+	//
+	const auto svc_count = get_svc_count_ssdt( );
 
-    //
-    // Return the routine's address if the index is valid.
-    //
-    return (svc_count && index < svc_count) ? *system_dispatch_array[index]
-                                            : nullptr;
+	//
+	// Return the routine's address if the index is valid.
+	//
+	return ( svc_count && index < svc_count ) ? *system_dispatch_array[ index ] : nullptr;
 }
 
 //
 // Gets the pointer to a routine in Shadow SSDT by its index.
 //
-void* kaspersky::get_shadow_ssdt_routine(unsigned short index) {
-    if (!system_dispatch_array)
-        return nullptr;
+void* kaspersky::get_shadow_ssdt_routine( unsigned short index )
+{
+	if ( !system_dispatch_array )
+		return nullptr;
 
-    //
-    // Get service count for SSDT and Shadow SSDT
-    //
-    const auto svc_count = get_svc_count_ssdt(),
-               svc_count_shadow_ssdt = get_svc_count_shadow_ssdt();
+	//
+	// Get service count for SSDT and Shadow SSDT
+	//
+	const auto svc_count = get_svc_count_ssdt( ), svc_count_shadow_ssdt = get_svc_count_shadow_ssdt( );
 
-    //
-    // Failed to obtain service count.
-    //
-    if (!svc_count || !svc_count_shadow_ssdt)
-        return nullptr;
+	//
+	// Failed to obtain service count.
+	//
+	if ( !svc_count || !svc_count_shadow_ssdt )
+		return nullptr;
 
-    //
-    // Calculate index for dispatch table.
-    //
-    const auto index_dispatch_table = (index - 0x1000) + svc_count;
+	//
+	// Calculate index for dispatch table.
+	//
+	const auto index_dispatch_table = ( index - 0x1000 ) + svc_count;
 
-    //
-    // Get dispatch table limit.
-    //
-    const auto dispatch_table_limit = svc_count + svc_count_shadow_ssdt;
+	//
+	// Get dispatch table limit.
+	//
+	const auto dispatch_table_limit = svc_count + svc_count_shadow_ssdt;
 
-    //
-    // Return the routine's address if the index is valid.
-    //
-    return (index_dispatch_table < dispatch_table_limit)
-               ? *system_dispatch_array[index_dispatch_table]
-               : nullptr;
+	//
+	// Return the routine's address if the index is valid.
+	//
+	return ( index_dispatch_table < dispatch_table_limit ) ? *system_dispatch_array[ index_dispatch_table ] : nullptr;
 }
