@@ -26,128 +26,152 @@ bool kaspersky::is_klhk_loaded( )
 //
 // Finds required addresses by pattern scanning klhk.sys.
 //
-bool kaspersky::initialize( )
-{
-	//
-	// Find klhk's hvm thread object.
-	//
-	auto presult = utils::find_pattern_km( L"klhk.sys", ".text", "\x48\x39\x2D\x00\x00\x00\x00\x89", "xxx????x" );
+bool kaspersky::initialize() {
+    //
+    // Find klhk's hvm thread object.
+    //
+    auto presult = utils::find_pattern_km(
+        L"klhk.sys", ".text", "\x48\x39\x2D\x00\x00\x00\x00\x89", "xxx????x");
 
-	if ( !presult )
-		return false;
+    if (!presult)
+        return false;
 
-	hvm_thread_object = reinterpret_cast< PETHREAD* >( presult + *reinterpret_cast< int* >( presult + 0x3 ) + 0x7 );
+    hvm_thread_object = reinterpret_cast<PETHREAD*>(
+        presult + *reinterpret_cast<int*>(presult + 0x3) + 0x7);
 
-	//
-	// Find klhk's hvm run counter.
-	//
-	presult = utils::find_pattern_km( L"klhk.sys", ".text", "\xF0\xFF\x05\x00\x00\x00\x00\x48\x8D\x0D", "xxx????xxx" );
+    //
+    // Find klhk's hvm run counter.
+    //
+    presult = utils::find_pattern_km(L"klhk.sys", ".text",
+                                     "\xF0\xFF\x05\x00\x00\x00\x00\x48\x8D\x0D",
+                                     "xxx????xxx");
 
-	if ( !presult )
-		return false;
+    if (!presult)
+        return false;
 
-	hvm_run_requests = reinterpret_cast< PLONG >( presult + *reinterpret_cast< int* >( presult + 0x3 ) + 0x7 );
+    hvm_run_requests = reinterpret_cast<PLONG>(
+        presult + *reinterpret_cast<int*>(presult + 0x3) + 0x7);
 
-	//
-	// Find klhk's hvm notification event.
-	//
-	presult += 0x7;
-	hvm_notification_event = reinterpret_cast< PRKEVENT >( presult + *reinterpret_cast< int* >( presult + 0x3 ) + 0x7 );
+    //
+    // Find klhk's hvm notification event.
+    //
+    presult += 0x7;
+    hvm_notification_event = reinterpret_cast<PRKEVENT>(
+        presult + *reinterpret_cast<int*>(presult + 0x3) + 0x7);
 
-	//
-	// Find klhk's hvm synchronization event.
-	//
-	presult = utils::find_pattern_km( L"klhk.sys", ".text", "\x48\x8D\x05\x00\x00\x00\x00\x49\x89\x73", "xxx????xxx" );
+    //
+    // Find klhk's hvm synchronization event.
+    //
+    presult = utils::find_pattern_km(L"klhk.sys", ".text",
+                                     "\x48\x8D\x05\x00\x00\x00\x00\x49\x89\x73",
+                                     "xxx????xxx");
 
-	if ( !presult )
-		return false;
+    if (!presult)
+        return false;
 
-	hvm_sync_event = reinterpret_cast< PRKEVENT >( presult + *reinterpret_cast< int* >( presult + 0x3 ) + 0x7 );
+    hvm_sync_event = reinterpret_cast<PRKEVENT>(
+        presult + *reinterpret_cast<int*>(presult + 0x3) + 0x7);
 
-	//
-	// Find klhk's hvm status.
-	//
-	presult = utils::find_pattern_km( L"klhk.sys", ".text", "\x8B\x1D\x00\x00\x00\x00\x89", "xx????x" );
+    //
+    // Find klhk's hvm status.
+    //
+    presult = utils::find_pattern_km(L"klhk.sys", ".text",
+                                     "\x8B\x1D\x00\x00\x00\x00\x89", "xx????x");
 
-	if ( !presult )
-		return false;
+    if (!presult)
+        return false;
 
-	hvm_status = reinterpret_cast< PNTSTATUS >( presult + *reinterpret_cast< int* >( presult + 0x2 ) + 0x6 );
+    hvm_status = reinterpret_cast<PNTSTATUS>(
+        presult + *reinterpret_cast<int*>(presult + 0x2) + 0x6);
 
-	//
-	// Find klhk's service table.
-	//
-	presult = utils::find_pattern_km( L"klhk.sys", "_hvmcode", "\x4C\x8D\x0D\x00\x00\x00\x00\x4D", "xxx????x" );
+    //
+    // Find klhk's service table.
+    //
+    presult =
+        utils::find_pattern_km(L"klhk.sys", "_hvmcode",
+                               "\x4C\x8D\x0D\x00\x00\x00\x00\x4D", "xxx????x");
 
-	if ( !presult )
-		return false;
+    if (!presult)
+        return false;
 
-	system_dispatch_array = reinterpret_cast< void*** >( presult + *reinterpret_cast< int* >( presult + 0x3 ) + 0x7 );
+    system_dispatch_array = reinterpret_cast<void***>(
+        presult + *reinterpret_cast<int*>(presult + 0x3) + 0x7);
 
-	//
-	// Find number of services (SSDT).
-	//
-	presult = utils::find_pattern_km( L"klhk.sys", ".text", "\x89\x0D\x00\x00\x00\x00\x8B", "xx????x" );
+    //
+    // Find number of services (SSDT).
+    //
+    presult = utils::find_pattern_km(
+        L"klhk.sys", ".text", "\x89\x0D\x00\x00\x00\x00\x8B\xD3", "xx????xx");
 
-	if ( !presult )
-		return false;
+    if (!presult)
+        return false;
 
-	ssdt_service_count = reinterpret_cast< unsigned int* >( presult + *reinterpret_cast< int* >( presult + 0x2 ) + 0x6 );
+    ssdt_service_count = reinterpret_cast<unsigned int*>(
+        presult + *reinterpret_cast<int*>(presult + 0x2) + 0x6);
 
-	//
-	// Find number of services (Shadow SSDT).
-	//
-	presult = utils::find_pattern_km( L"klhk.sys", ".text", "\x89\x05\x00\x00\x00\x00\x85\xC0", "xx????xx" );
+    //
+    // Find number of services (Shadow SSDT).
+    //
+    presult = utils::find_pattern_km(
+        L"klhk.sys", ".text", "\x89\x05\x00\x00\x00\x00\x85\xC0", "xx????xx");
 
-	if ( !presult )
-		return false;
+    if (!presult)
+        return false;
 
-	shadow_ssdt_service_count = reinterpret_cast< unsigned int* >( presult + *reinterpret_cast< int* >( presult + 0x2 ) + 0x6 );
+    shadow_ssdt_service_count = reinterpret_cast<unsigned int*>(
+        presult + *reinterpret_cast<int*>(presult + 0x2) + 0x6);
 
-	//
-	// Find provider data.
-	//
-	presult = utils::find_pattern_km( L"klhk.sys", ".text", "\x39\x1D\x00\x00\x00\x00\x75", "xx????x" );
+    //
+    // Find provider data.
+    //
+    presult = utils::find_pattern_km(L"klhk.sys", ".text",
+                                     "\x39\x1D\x00\x00\x00\x00\x75", "xx????x");
 
-	if ( !presult )
-		return false;
+    if (!presult)
+        return false;
 
-	provider = reinterpret_cast< unsigned int* >( presult + *reinterpret_cast< int* >( presult + 2 ) + 0x6 );
-	return true;
+    provider = reinterpret_cast<unsigned int*>(
+        presult + *reinterpret_cast<int*>(presult + 2) + 0x6);
+    return true;
 }
 
 //
 // Performs hypervisor initialization.
 //
-NTSTATUS kaspersky::hvm_init( )
-{
-	if ( !hvm_thread_object || !( *hvm_thread_object ) ||
-		 !hvm_run_requests || !hvm_notification_event ||
-		 !hvm_sync_event || !hvm_status ||
-		 !provider )
-	{
-		return STATUS_BAD_DATA;
+NTSTATUS kaspersky::hvm_init() {
+#define ASSERT_TRUE(x)                                      \
+	if (!(x)) {                                             \
+		log("Assertion failed: %s", #x); \
+		return STATUS_ASSERTION_FAILURE; \
 	}
 
-	//
-	// Set provider to random value.
-	//
-	*provider = 4;
+	ASSERT_TRUE(hvm_thread_object);
+	ASSERT_TRUE(*hvm_thread_object);
+	ASSERT_TRUE(hvm_run_requests);
+	ASSERT_TRUE(hvm_notification_event);
+	ASSERT_TRUE(hvm_sync_event);
+	ASSERT_TRUE(hvm_status);
+	ASSERT_TRUE(provider);
 
-	//
-	// Hypervisor initialization.
-	//
-	_InterlockedIncrement( hvm_run_requests );
-	KeResetEvent( hvm_notification_event );
-	KeSetEvent( hvm_sync_event, IO_NO_INCREMENT, FALSE );
-	KeWaitForSingleObject( hvm_notification_event, Executive, KernelMode, FALSE, nullptr );
+    //
+    // Set provider to random value.
+    //
+    *provider = 4;
 
-	//
-	// Get returned status.
-	//
-	return *hvm_status;
+    //
+    // Hypervisor initialization.
+    //
+    _InterlockedIncrement(hvm_run_requests);
+    KeResetEvent(hvm_notification_event);
+    KeSetEvent(hvm_sync_event, IO_NO_INCREMENT, FALSE);
+    KeWaitForSingleObject(hvm_notification_event, Executive, KernelMode, FALSE,
+                          nullptr);
+
+    //
+    // Get returned status.
+    //
+    return *hvm_status;
 }
-
 //
 // Gets the number of services in the SSDT.
 //
